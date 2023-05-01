@@ -50,7 +50,7 @@ def token_counts(data, oov_token = "[oov]",thresh = 100):
     dictionary = dictionary.reset_index()
     
     return dictionary
-# 
+
 
 def embeddings_to_words(embeddings_dict,dictionary):
     """create a dictionary containing words from the dataset and their embeddings. 
