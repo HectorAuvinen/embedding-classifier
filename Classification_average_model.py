@@ -8,6 +8,23 @@ OOV_TOKEN = "[oov]"
 class ClassificationAverageModel(torch.nn.Module):
     """
     Class for a classification model that averages word embeddings and then uses a linear layer to classify
+
+    Attributes
+    ----------
+    embeddings : torch.nn.Parameter
+        the embeddings of the words
+    linear : torch.nn.Linear
+        the linear layer that maps a document to label logits
+    softmax : torch.nn.Softmax
+        the softmax layer that maps label logits to probabilities
+
+    Methods
+    -------
+    forward(x):
+        forward pass of the model.
+    
+    predict(x):
+        predict the class of a batch of documents
     """
     def __init__(self, embeddings, document_dim, num_classes):
         super().__init__()
@@ -62,7 +79,26 @@ class ClassificationAverageModel(torch.nn.Module):
 
 
 class NLP_Dictionary():
-    """ class for handling the index mapping between dictionary and embeddings, and resizing the data """
+    """ 
+    class for handling the index mapping between dictionary and embeddings, and resizing the data
+
+    Attributes
+    ----------
+    dictionary : Pandas DataFrame
+        vocabulary containing the words and their indices
+    oov_index : int
+        index of the OOV token in the dictionary
+
+    Methods
+    -------
+    word_to_id(word):
+        return the index of a word
+    words_to_ids(words):
+        turn a list of words into a list of ids.
+    resize(words, length, padding_token):
+        resize any list to <length>, pad if too small.
+        
+    """
     def __init__(self, dictionary, oov_token):
         self.dictionary = dictionary
         self.oov_index = dictionary.loc[dictionary["index"] == oov_token].index.item()
@@ -107,7 +143,7 @@ def prepare_batching_data(
     max_document_length = 50,
     padding_token=OOV_TOKEN
     ):
-    """ Map list of words to list of ids, resize each sample to max_document_length and transform to tensors. """
+    """ Map pd series of words to pd series of ids, resize each sample to max_document_length and transform to tensors. """
 
     labels = torch.tensor(list(labels))
 
@@ -130,7 +166,7 @@ def batch_generator(
     labels,
     batch_size
     ):
-    """Pyhton Generator that yields batches until there are no more samples."""
+    """Python Generator that yields batches until there are no more samples."""
     
     n = 0
     while True:
@@ -204,7 +240,7 @@ def accuracy(logits, y):
 
 
 def create_embedding_matrix(embeddings_dict,dictionary):
-    """create an embedding matrix that maps words to indices. 
+    """create an embedding matrix that maps glove embeddings to indices. 
     If word is not in embeddings, sample from uniform distribution in range of embedding values"""
 
     # get bounds for dictionary
